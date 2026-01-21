@@ -94,7 +94,55 @@ export interface CancelReservationResponse {
   penaltyAmount: number;
 }
 
+export enum UserRole {
+  ADMINISTRADOR = 'ADMINISTRADOR',
+  RECEPCIONISTA = 'RECEPCIONISTA',
+}
+
 export interface User {
+  id: number;
+  nombre: string;
+  cargo: string;
   username: string;
-  role: 'gerente' | 'recepcionista';
+  celular?: string;
+  dni?: string;
+  role: UserRole;
+  activo: boolean;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  id: number;
+  nombre: string;
+  cargo: string;
+  username: string;
+  celular?: string;
+  dni?: string;
+  role: UserRole;
+  token: string;
+}
+
+export interface CreateUserRequest {
+  nombre: string;
+  cargo: string;
+  username: string;
+  password: string;
+  celular?: string;
+  dni?: string;
+  role: UserRole;
+}
+
+export interface UpdateUserRequest {
+  nombre?: string;
+  cargo?: string;
+  username?: string;
+  password?: string;
+  celular?: string;
+  dni?: string;
+  role?: UserRole;
+  activo?: boolean;
 }

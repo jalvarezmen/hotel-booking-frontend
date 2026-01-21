@@ -4,23 +4,11 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { toast } from 'sonner';
-
-// Datos mockeados de usuarios
-const MOCK_USERS = {
-  gerente: {
-    username: 'gerente',
-    password: 'gerente123',
-    role: 'gerente' as const,
-  },
-  recepcionista: {
-    username: 'recepcionista',
-    password: 'recepcion123',
-    role: 'recepcionista' as const,
-  },
-};
+import { authApi } from '../services/authApi';
+import type { LoginResponse } from '../services/types';
 
 interface LoginPageProps {
-  onLogin: (username: string, role: 'gerente' | 'recepcionista') => void;
+  onLogin: (userData: LoginResponse) => void;
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
@@ -33,25 +21,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular delay de autenticación
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const user = Object.values(MOCK_USERS).find(
-      (u) => u.username === username && u.password === password
-    );
-
-    if (user) {
-      toast.success(`¡Bienvenido ${user.role}!`, {
-        description: 'Inicio de sesión exitoso',
+    try {
+      const response = await authApi.login({ username, password });
+      
+      // Guardar token en localStorage
+      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('user', JSON.stringify(response));
+      
+      toast.success(`¡Bienvenido ${response.nombre}!`, {
+        description: `Rol: ${response.role === 'ADMINISTRADOR' ? 'Administrador' : 'Recepcionista'}`,
       });
-      onLogin(user.username, user.role);
-    } else {
-      toast.error('Credenciales inválidas', {
-        description: 'Usuario o contraseña incorrectos',
+      
+      onLogin(response);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Usuario o contraseña incorrectos';
+      toast.error('Error de autenticación', {
+        description: errorMessage,
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -150,26 +141,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               </Button>
             </form>
 
-            {/* Información de credenciales de prueba */}
-            <div className="mt-8 pt-6 border-t border-white/20">
-              <p className="text-white/60 text-xs text-center mb-3">
-                Credenciales de prueba:
-              </p>
-              <div className="space-y-2 text-xs">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                  <p className="text-white/80">
-                    <span className="text-[#FFD7BA] font-medium">Gerente:</span> gerente /
-                    gerente123
-                  </p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                  <p className="text-white/80">
-                    <span className="text-[#FFD7BA] font-medium">Recepcionista:</span>{' '}
-                    recepcionista / recepcion123
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
