@@ -15,9 +15,23 @@ export const reservationsApi = {
     return data;
   },
 
+  // Obtener reservas por fecha específica
+  getByDate: async (date: string): Promise<TodayReservations> => {
+    const { data } = await api.get<TodayReservations>('/reservations/by-date', {
+      params: { date },
+    });
+    return data;
+  },
+
   // Obtener reservas pendientes
   getPending: async (): Promise<Reservation[]> => {
     const { data } = await api.get<Reservation[]>('/reservations/pending');
+    return data;
+  },
+
+  // Obtener reservas activas (CONFIRMED y ACTIVE)
+  getActive: async (): Promise<Reservation[]> => {
+    const { data } = await api.get<Reservation[]>('/reservations/active');
     return data;
   },
 

@@ -30,17 +30,26 @@ const DEMO_MODE = false;
 function MainApp() {
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState('dashboard');
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
-  // Query para obtener reservas del día
+  // Función para determinar si la fecha seleccionada es hoy
+  const isTodaySelected = () => {
+    return selectedDate === new Date().toISOString().split('T')[0];
+  };
+
+  // Query para obtener reservas según la fecha seleccionada
   const { data: todayData, isLoading, error } = useQuery({
-    queryKey: ['reservations', 'today'],
+    queryKey: ['reservations', selectedDate],
     queryFn: async () => {
       if (DEMO_MODE) {
         // Simular delay de red
         await new Promise(resolve => setTimeout(resolve, 800));
         return mockTodayReservations;
       }
-      return reservationsApi.getToday();
+      if (isTodaySelected()) {
+        return reservationsApi.getToday();
+      }
+      return reservationsApi.getByDate(selectedDate);
     },
     enabled: user !== null && currentView === 'dashboard',
     refetchOnMount: true,
@@ -49,12 +58,12 @@ function MainApp() {
 
   const queryClientInstance = useQueryClient();
 
-  // Refrescar reservas cuando cambias a la vista del dashboard
+  // Refrescar reservas cuando cambias a la vista del dashboard o cambias la fecha
   useEffect(() => {
     if (currentView === 'dashboard' && user) {
-      queryClientInstance.invalidateQueries({ queryKey: ['reservations', 'today'] });
+      queryClientInstance.invalidateQueries({ queryKey: ['reservations', selectedDate] });
     }
-  }, [currentView, user, queryClientInstance]);
+  }, [currentView, user, selectedDate, queryClientInstance]);
 
   // Mutation para check-in
   const checkInMutation = useMutation({
@@ -67,7 +76,7 @@ function MainApp() {
       return reservationsApi.checkIn(id);
     },
     onSuccess: () => {
-      queryClientInstance.invalidateQueries({ queryKey: ['reservations', 'today'] });
+      queryClientInstance.invalidateQueries({ queryKey: ['reservations', selectedDate] });
       if (!DEMO_MODE) {
         toast.success('Check-in realizado exitosamente');
       }
@@ -88,7 +97,7 @@ function MainApp() {
       return reservationsApi.checkOut(id);
     },
     onSuccess: () => {
-      queryClientInstance.invalidateQueries({ queryKey: ['reservations', 'today'] });
+      queryClientInstance.invalidateQueries({ queryKey: ['reservations', selectedDate] });
       if (!DEMO_MODE) {
         toast.success('Check-out realizado exitosamente');
       }
@@ -146,6 +155,8 @@ function MainApp() {
               {todayData && (
                 <Dashboard
                   data={todayData}
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
                   onCheckIn={handleCheckIn}
                   onCheckOut={handleCheckOut}
                 />
