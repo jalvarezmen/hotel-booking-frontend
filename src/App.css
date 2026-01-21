@@ -1,1 +1,27 @@
 /* Estilos adicionales de componentes si es necesario */
+
+/* Estilos para imagen de fondo con bordes redondeados y camuflaje */
+.app-container {
+  position: relative;
+}
+
+.app-container::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 1100px;
+  aspect-ratio: 1;
+  background-image: url('/Fondo.png');
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: 2rem;
+  opacity: 0.50;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #FAF8F5;
+  background-blend-mode: multiply;
+}
