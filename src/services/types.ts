@@ -40,6 +40,7 @@ export interface Room {
   capacity: number;
   pricePerNight: number;
   isAvailable: boolean;
+  imageUrl?: string;
 }
 
 export interface Reservation {

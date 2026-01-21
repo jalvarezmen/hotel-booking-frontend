@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Bed, Hash, Users, DollarSign, Building2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Bed, Hash, Users, DollarSign, Building2, Image, MoreVertical } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../ui/table';
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '../ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +53,7 @@ interface RoomFormData {
   roomType: RoomType;
   capacity: number;
   pricePerNight: number;
+  imageUrl: string;
 }
 
 const initialFormData: RoomFormData = {
@@ -56,6 +61,7 @@ const initialFormData: RoomFormData = {
   roomType: RoomType.STANDARD,
   capacity: 1,
   pricePerNight: 0,
+  imageUrl: '',
 };
 
 const roomTypeLabels: Record<RoomType, string> = {
@@ -78,7 +84,14 @@ export function RoomsManagement() {
   // Query para obtener todas las habitaciones
   const { data: rooms, isLoading, error } = useQuery({
     queryKey: ['rooms'],
-    queryFn: () => roomsApi.getAll(),
+    queryFn: async () => {
+      const roomsData = await roomsApi.getAll();
+      console.log('Habitaciones obtenidas:', roomsData);
+      roomsData.forEach(room => {
+        console.log(`Habitación ${room.roomNumber}: imageUrl =`, room.imageUrl);
+      });
+      return roomsData;
+    },
   });
 
   // Mutation para crear habitación
@@ -88,8 +101,18 @@ export function RoomsManagement() {
       roomType: data.roomType,
       capacity: data.capacity,
       pricePerNight: data.pricePerNight,
+      imageUrl: data.imageUrl && data.imageUrl.trim() !== '' ? data.imageUrl.trim() : undefined,
     }),
-    onSuccess: () => {
+    onSuccess: (newRoom) => {
+      // Debug: verificar que la respuesta incluya imageUrl
+      console.log('Habitación creada:', newRoom);
+      console.log('ImageUrl recibido:', newRoom.imageUrl);
+      
+      // Actualizar la cache directamente con la respuesta del servidor
+      queryClient.setQueryData(['rooms'], (oldRooms: Room[] = []) => {
+        return [...oldRooms, newRoom];
+      });
+      // Invalidar para asegurar que se recarguen todos los datos
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
       toast.success('Habitación creada exitosamente');
       handleCloseDialog();
@@ -108,8 +131,13 @@ export function RoomsManagement() {
         roomType: data.roomType,
         capacity: data.capacity,
         pricePerNight: data.pricePerNight,
+        imageUrl: data.imageUrl && data.imageUrl.trim() !== '' ? data.imageUrl.trim() : undefined,
       }),
-    onSuccess: () => {
+    onSuccess: (updatedRoom) => {
+      // Actualizar la cache directamente con la respuesta del servidor
+      queryClient.setQueryData(['rooms'], (oldRooms: Room[] = []) => {
+        return oldRooms.map(room => room.id === updatedRoom.id ? updatedRoom : room);
+      });
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
       toast.success('Habitación actualizada exitosamente');
       handleCloseDialog();
@@ -143,6 +171,7 @@ export function RoomsManagement() {
         roomType: room.roomType,
         capacity: room.capacity,
         pricePerNight: room.pricePerNight,
+        imageUrl: room.imageUrl || '',
       });
     } else {
       setSelectedRoom(null);
@@ -225,67 +254,145 @@ export function RoomsManagement() {
         </Button>
       </div>
 
-      {/* Rooms Table */}
+      {/* Rooms Grid */}
       {rooms && rooms.length > 0 ? (
-        <div className="bg-white rounded-lg border border-[#E8DED0] overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-[#FAF8F5]">
-                <TableHead className="font-semibold text-[#3E2723]">Número</TableHead>
-                <TableHead className="font-semibold text-[#3E2723]">Tipo</TableHead>
-                <TableHead className="font-semibold text-[#3E2723]">Capacidad</TableHead>
-                <TableHead className="font-semibold text-[#3E2723]">Precio/Noche</TableHead>
-                <TableHead className="font-semibold text-[#3E2723]">Estado</TableHead>
-                <TableHead className="font-semibold text-[#3E2723] text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rooms.map((room) => (
-                <TableRow key={room.id} className="hover:bg-[#FAF8F5]">
-                  <TableCell className="font-medium">{room.roomNumber}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-[#FFF5E6] text-[#8B7355] border-[#E8DED0]">
-                      {roomTypeLabels[room.roomType]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{room.capacity} {room.capacity === 1 ? 'persona' : 'personas'}</TableCell>
-                  <TableCell className="font-medium">{formatCurrency(room.pricePerNight)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={room.isAvailable ? 'default' : 'secondary'}
-                      className={
-                        room.isAvailable
-                          ? 'bg-green-100 text-green-800 border-green-300'
-                          : 'bg-red-100 text-red-800 border-red-300'
-                      }
-                    >
-                      {room.isAvailable ? 'Disponible' : 'Ocupada'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {rooms.map((room) => (
+            <Card 
+              key={room.id} 
+              className="bg-white border-[#E8DED0] overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            >
+              {/* Imagen de la habitación */}
+              <div className="relative h-48 w-full overflow-hidden bg-[#FAF8F5]">
+                {room.imageUrl && room.imageUrl.trim() !== '' ? (
+                  <>
+                    <img
+                      src={room.imageUrl}
+                      alt={`Habitación ${room.roomNumber}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onLoad={() => console.log('Imagen cargada exitosamente:', room.imageUrl)}
+                      onError={(e) => {
+                        console.error('Error cargando imagen:', room.imageUrl, e);
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                        const parent = img.parentElement;
+                        if (parent && !parent.querySelector('.error-placeholder')) {
+                          const placeholder = document.createElement('div');
+                          placeholder.className = 'error-placeholder w-full h-full flex items-center justify-center';
+                          placeholder.innerHTML = `
+                            <svg class="w-16 h-16 text-[#D4C5B0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                          `;
+                          parent.appendChild(placeholder);
+                        }
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Bed className="w-16 h-16 text-[#D4C5B0]" />
+                  </div>
+                )}
+                {/* Badge de Estado */}
+                <div className="absolute top-3 right-3">
+                  <Badge
+                    variant={room.isAvailable ? 'default' : 'secondary'}
+                    className={
+                      room.isAvailable
+                        ? 'bg-green-100 text-green-800 border-green-300 font-medium'
+                        : 'bg-red-100 text-red-800 border-red-300 font-medium'
+                    }
+                  >
+                    {room.isAvailable ? 'Disponible' : 'Ocupada'}
+                  </Badge>
+                </div>
+                {/* Menú de acciones */}
+                <div className="absolute top-3 left-3">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
+                        type="button"
+                      >
+                        <MoreVertical className="w-4 h-4 text-[#3E2723]" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="bg-white border-[#E8DED0]">
+                      <DropdownMenuItem
                         onClick={() => handleOpenDialog(room)}
-                        className="h-8 w-8 p-0"
+                        className="cursor-pointer focus:bg-[#FAF8F5]"
                       >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         onClick={() => handleOpenDeleteDialog(room.id)}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              {/* Contenido de la tarjeta */}
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#3E2723]">#{room.roomNumber}</h3>
+                    <p className="text-sm text-[#8B7355] mt-0.5">
+                      {roomTypeLabels[room.roomType]}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-[#8B7355] pt-2 border-t border-[#E8DED0]">
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    <span>{room.capacity} {room.capacity === 1 ? 'persona' : 'personas'}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold text-[#FF6B35]">
+                      {formatCurrency(room.pricePerNight)}
+                    </span>
+                    <span className="text-sm text-[#8B7355]">/noche</span>
+                  </div>
+                </div>
+              </CardContent>
+
+              {/* Footer con botones de acción */}
+              <CardFooter className="p-4 pt-0 flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleOpenDialog(room)}
+                  className="flex-1 border-[#E8DED0] text-[#3E2723] hover:bg-[#FAF8F5] hover:border-[#D4C5B0]"
+                >
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Editar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleOpenDeleteDialog(room.id)}
+                  className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-[#E8DED0] p-12 text-center">
@@ -445,8 +552,43 @@ export function RoomsManagement() {
                   </p>
                 )}
                 <p className="text-xs text-[#8B7355] mt-1">
-                  Ingresa el precio en pesos argentinos (ARS)
+                  Ingresa el precio en dólares (USD)
                 </p>
+              </div>
+
+              {/* URL de Imagen */}
+              <div className="space-y-2">
+                <Label htmlFor="imageUrl" className="text-[#3E2723] font-medium flex items-center gap-2">
+                  <Image className="w-4 h-4 text-[#FF6B35]" />
+                  URL de Imagen (Opcional)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="imageUrl"
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imageUrl: e.target.value })
+                    }
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    className="h-12 rounded-xl bg-[#FEFDFB] border-[#E8DED0] text-[#3E2723] placeholder:text-[#8B7355]/50 focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/20 transition-all"
+                  />
+                </div>
+                <p className="text-xs text-[#8B7355] mt-1">
+                  Ingresa la URL de la imagen de la habitación (JPG, PNG, GIF, WEBP)
+                </p>
+                {formData.imageUrl && (
+                  <div className="mt-2">
+                    <img 
+                      src={formData.imageUrl} 
+                      alt="Vista previa" 
+                      className="w-full h-32 object-cover rounded-lg border border-[#E8DED0]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
