@@ -15,6 +15,12 @@ export const reservationsApi = {
     return data;
   },
 
+  // Obtener reservas pendientes
+  getPending: async (): Promise<Reservation[]> => {
+    const { data } = await api.get<Reservation[]>('/reservations/pending');
+    return data;
+  },
+
   // Crear reserva
   create: async (reservation: CreateReservationDTO): Promise<Reservation> => {
     const { data } = await api.post<Reservation>('/reservations', reservation);

@@ -1,4 +1,4 @@
-import { Home, Calendar, Search, DoorOpen, LogOut } from 'lucide-react';
+import { Home, Calendar, Search, DoorOpen, LogOut, Clock } from 'lucide-react';
 import { User } from '../../services/types';
 
 interface SidebarProps {
@@ -12,6 +12,7 @@ export function Sidebar({ currentView, onViewChange, user, onLogout }: SidebarPr
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'new-reservation', label: 'Nueva Reserva', icon: Calendar },
+    { id: 'pending-reservations', label: 'Reservas Pendientes', icon: Clock },
     { id: 'search', label: 'Buscar Reservas', icon: Search },
     { id: 'rooms', label: 'Habitaciones', icon: DoorOpen },
   ];

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Toaster, toast } from 'sonner';
 import { LoginPage } from './components/LoginPage';
@@ -7,10 +7,11 @@ import { Dashboard } from './components/dashboard/Dashboard';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { PlaceholderView } from './components/placeholder/PlaceholderView';
 import { RoomsManagement } from './components/rooms/RoomsManagement';
+import { NewReservation } from './components/reservations/NewReservation';
+import { PendingReservations } from './components/reservations/PendingReservations';
 import { reservationsApi } from './services/reservationsApi';
 import { mockTodayReservations } from './services/mockData';
 import type { User } from './services/types';
-import './App.css';
 
 // Configuración de React Query
 const queryClient = new QueryClient({
@@ -42,9 +43,18 @@ function MainApp() {
       return reservationsApi.getToday();
     },
     enabled: user !== null && currentView === 'dashboard',
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const queryClientInstance = useQueryClient();
+
+  // Refrescar reservas cuando cambias a la vista del dashboard
+  useEffect(() => {
+    if (currentView === 'dashboard' && user) {
+      queryClientInstance.invalidateQueries({ queryKey: ['reservations', 'today'] });
+    }
+  }, [currentView, user, queryClientInstance]);
 
   // Mutation para check-in
   const checkInMutation = useMutation({
@@ -113,7 +123,7 @@ function MainApp() {
   }
 
   return (
-    <div className="flex h-screen bg-[#FAF8F5] app-container">
+    <div className="flex h-screen bg-[#FAF8F5]">
       {/* Sidebar */}
       <Sidebar
         currentView={currentView}
@@ -123,7 +133,7 @@ function MainApp() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto relative z-10">
+      <main className="flex-1 overflow-auto">
         <div className="p-8">
           {currentView === 'dashboard' && (
             <>
@@ -143,12 +153,9 @@ function MainApp() {
             </>
           )}
           
-          {currentView === 'new-reservation' && (
-            <PlaceholderView
-              title="Nueva Reserva"
-              description="Esta sección permitirá crear nuevas reservas con un formulario multi-paso para ingresar datos del huésped, fechas y seleccionar habitación."
-            />
-          )}
+          {currentView === 'new-reservation' && <NewReservation />}
+          
+          {currentView === 'pending-reservations' && <PendingReservations />}
           
           {currentView === 'search' && (
             <PlaceholderView
