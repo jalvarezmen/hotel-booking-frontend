@@ -5,10 +5,10 @@ import { LoginPage } from './components/LoginPage';
 import { Sidebar } from './components/layout/Sidebar';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
-import { PlaceholderView } from './components/placeholder/PlaceholderView';
 import { RoomsManagement } from './components/rooms/RoomsManagement';
 import { NewReservation } from './components/reservations/NewReservation';
 import { PendingReservations } from './components/reservations/PendingReservations';
+import { SearchReservations } from './components/reservations/SearchReservations';
 import { reservationsApi } from './services/reservationsApi';
 import { mockTodayReservations } from './services/mockData';
 import type { User } from './services/types';
@@ -168,12 +168,7 @@ function MainApp() {
           
           {currentView === 'pending-reservations' && <PendingReservations />}
           
-          {currentView === 'search' && (
-            <PlaceholderView
-              title="Buscar Reservas"
-              description="Aquí podrás buscar reservas por número de reserva o nombre de huésped, con resultados en tiempo real."
-            />
-          )}
+          {currentView === 'search' && <SearchReservations />}
           
           {currentView === 'rooms' && <RoomsManagement />}
         </div>
