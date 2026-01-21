@@ -9,9 +9,10 @@ import { RoomsManagement } from './components/rooms/RoomsManagement';
 import { NewReservation } from './components/reservations/NewReservation';
 import { PendingReservations } from './components/reservations/PendingReservations';
 import { SearchReservations } from './components/reservations/SearchReservations';
+import { UsersManagement } from './components/users/UsersManagement';
 import { reservationsApi } from './services/reservationsApi';
 import { mockTodayReservations } from './services/mockData';
-import type { User } from './services/types';
+import type { LoginResponse } from './services/types';
 
 // Configuración de React Query
 const queryClient = new QueryClient({
@@ -28,7 +29,21 @@ const queryClient = new QueryClient({
 const DEMO_MODE = false;
 
 function MainApp() {
-  const [user, setUser] = useState<User | null>(null);
+  // Verificar si hay una sesión guardada
+  const getStoredUser = (): LoginResponse | null => {
+    const stored = localStorage.getItem('user');
+    const token = localStorage.getItem('auth_token');
+    if (stored && token) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const [user, setUser] = useState<LoginResponse | null>(getStoredUser());
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
@@ -107,12 +122,14 @@ function MainApp() {
     },
   });
 
-  const handleLogin = (username: string, role: 'gerente' | 'recepcionista') => {
-    setUser({ username, role });
-    toast.success(`¡Bienvenido, ${username}!`);
+  const handleLogin = (userData: LoginResponse) => {
+    setUser(userData);
+    setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
     setUser(null);
     setCurrentView('dashboard');
     toast.success('Sesión cerrada correctamente');
@@ -171,6 +188,8 @@ function MainApp() {
           {currentView === 'search' && <SearchReservations />}
           
           {currentView === 'rooms' && <RoomsManagement />}
+          
+          {currentView === 'users' && user?.role === 'ADMINISTRADOR' && <UsersManagement />}
         </div>
       </main>
 

@@ -1,10 +1,10 @@
-import { Home, Calendar, Search, DoorOpen, LogOut, Clock } from 'lucide-react';
-import { User } from '../../services/types';
+import { Home, Calendar, Search, DoorOpen, LogOut, Clock, Users } from 'lucide-react';
+import type { LoginResponse } from '../../services/types';
 
 interface SidebarProps {
   currentView: string;
   onViewChange: (view: string) => void;
-  user: User;
+  user: LoginResponse;
   onLogout: () => void;
 }
 
@@ -33,8 +33,10 @@ export function Sidebar({ currentView, onViewChange, user, onLogout }: SidebarPr
             </span>
           </div>
           <div>
-            <p className="text-sm font-medium text-[#3E2723]">{user.username}</p>
-            <p className="text-xs text-[#8B7355] capitalize">{user.role}</p>
+            <p className="text-sm font-medium text-[#3E2723]">{user.nombre}</p>
+            <p className="text-xs text-[#8B7355]">
+              {user.role === 'ADMINISTRADOR' ? 'Administrador' : 'Recepcionista'}
+            </p>
           </div>
         </div>
       </div>
@@ -60,6 +62,21 @@ export function Sidebar({ currentView, onViewChange, user, onLogout }: SidebarPr
             </button>
           );
         })}
+        
+        {/* Gestión de Usuarios - Solo para Administrador */}
+        {user.role === 'ADMINISTRADOR' && (
+          <button
+            onClick={() => onViewChange('users')}
+            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              currentView === 'users'
+                ? 'bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] text-white shadow-md'
+                : 'text-[#3E2723] hover:bg-[#FAF8F5]'
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span>Gestión de Usuarios</span>
+          </button>
+        )}
       </nav>
 
       {/* Logout */}
