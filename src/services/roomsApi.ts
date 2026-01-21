@@ -12,10 +12,10 @@ export const roomsApi = {
   getAvailable: async (
     checkInDate: string,
     checkOutDate: string,
-    numberOfGuests?: number
+    roomType?: string
   ): Promise<Room[]> => {
     const { data } = await api.get<Room[]>('/rooms/available', {
-      params: { checkInDate, checkOutDate, numberOfGuests },
+      params: { checkIn: checkInDate, checkOut: checkOutDate, roomType },
     });
     return data;
   },

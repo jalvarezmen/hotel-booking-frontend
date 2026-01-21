@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
 });
 
 // Modo demo - cambiar a false cuando el backend esté disponible
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 function MainApp() {
   const [user, setUser] = useState<User | null>(null);

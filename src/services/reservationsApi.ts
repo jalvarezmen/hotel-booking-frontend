@@ -57,13 +57,13 @@ export const reservationsApi = {
 
   // Check-in
   checkIn: async (id: number): Promise<Reservation> => {
-    const { data } = await api.post<Reservation>(`/reservations/${id}/checkin`);
+    const { data } = await api.post<Reservation>(`/reservations/${id}/check-in`);
     return data;
   },
 
   // Check-out
   checkOut: async (id: number): Promise<Reservation> => {
-    const { data } = await api.post<Reservation>(`/reservations/${id}/checkout`);
+    const { data } = await api.post<Reservation>(`/reservations/${id}/check-out`);
     return data;
   },
 
