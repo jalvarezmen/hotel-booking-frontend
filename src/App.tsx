@@ -6,6 +6,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { PlaceholderView } from './components/placeholder/PlaceholderView';
+import { RoomsManagement } from './components/rooms/RoomsManagement';
 import { reservationsApi } from './services/reservationsApi';
 import { mockTodayReservations } from './services/mockData';
 import type { User } from './services/types';
@@ -155,12 +156,7 @@ function MainApp() {
             />
           )}
           
-          {currentView === 'rooms' && (
-            <PlaceholderView
-              title="Gestión de Habitaciones"
-              description="Gestiona las habitaciones del hotel: ver listado completo, crear, editar y eliminar habitaciones."
-            />
-          )}
+          {currentView === 'rooms' && <RoomsManagement />}
         </div>
       </main>
 
