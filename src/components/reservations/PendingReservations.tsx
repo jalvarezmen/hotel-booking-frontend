@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Clock, DollarSign, User, Calendar, Building2, Users, CreditCard } from 'lucide-react';
+import { Clock, DollarSign, User, Calendar, Building2, Users, CreditCard, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import {
@@ -14,6 +14,7 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
 import {
   Select,
   SelectContent,
@@ -30,6 +31,8 @@ import { formatCurrency, formatDate, translateRoomType } from '../../utils/forma
 export function PendingReservations() {
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const [paymentData, setPaymentData] = useState({
     paymentMethod: 'CASH' as PaymentMethod,
     amount: 0,
@@ -70,6 +73,37 @@ export function PendingReservations() {
     },
   });
 
+  // Mutation para cancelar reserva
+  const cancelReservationMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      reservationsApi.cancel(id, { reason }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['reservations', 'pending'] });
+      queryClient.invalidateQueries({ queryKey: ['reservations', 'today'] });
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      
+      let message = 'Reserva cancelada exitosamente';
+      if (data.refundAmount > 0 || data.penaltyAmount > 0) {
+        const parts = [];
+        if (data.refundAmount > 0) {
+          parts.push(`Reembolso: ${formatCurrency(data.refundAmount)}`);
+        }
+        if (data.penaltyAmount > 0) {
+          parts.push(`Penalización: ${formatCurrency(data.penaltyAmount)}`);
+        }
+        message += ` (${parts.join(', ')})`;
+      }
+      
+      toast.success(message);
+      setIsCancelDialogOpen(false);
+      setSelectedReservation(null);
+      setCancelReason('');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al cancelar la reserva');
+    },
+  });
+
   const handleConfirmPayment = (reservation: Reservation) => {
     setSelectedReservation(reservation);
     setPaymentData({
@@ -99,6 +133,26 @@ export function PendingReservations() {
     confirmPaymentMutation.mutate({
       id: selectedReservation.id,
       payment: paymentData,
+    });
+  };
+
+  const handleCancelReservation = (reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setCancelReason('');
+    setIsCancelDialogOpen(true);
+  };
+
+  const handleSubmitCancel = () => {
+    if (!selectedReservation) return;
+
+    if (!cancelReason.trim()) {
+      toast.error('Debes ingresar un motivo para cancelar la reserva');
+      return;
+    }
+
+    cancelReservationMutation.mutate({
+      id: selectedReservation.id,
+      reason: cancelReason.trim(),
     });
   };
 
@@ -191,14 +245,23 @@ export function PendingReservations() {
                   </div>
                 </div>
 
-                {/* Confirm Payment Button */}
-                <Button
-                  onClick={() => handleConfirmPayment(reservation)}
-                  className="w-full bg-[#FF6B35] hover:bg-[#FF8C42] text-white"
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Confirmar Pago
-                </Button>
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleConfirmPayment(reservation)}
+                    className="flex-1 bg-[#FF6B35] hover:bg-[#FF8C42] text-white"
+                  >
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Confirmar Pago
+                  </Button>
+                  <Button
+                    onClick={() => handleCancelReservation(reservation)}
+                    variant="outline"
+                    className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -330,6 +393,81 @@ export function PendingReservations() {
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Confirmar Pago
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Reservation Dialog */}
+      <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Cancelar Reserva</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas cancelar la reserva{' '}
+              {selectedReservation?.reservationNumber}? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Reservation Summary */}
+            {selectedReservation && (
+              <div className="bg-[#F0EAE0] rounded-lg p-4 space-y-2 text-sm">
+                <p>
+                  <strong>Huésped:</strong> {selectedReservation.guest.fullName}
+                </p>
+                <p>
+                  <strong>Habitación:</strong> {selectedReservation.room.roomNumber} •{' '}
+                  {translateRoomType(selectedReservation.room.roomType)}
+                </p>
+                <p>
+                  <strong>Fechas:</strong> {formatDate(selectedReservation.checkInDate)} -{' '}
+                  {formatDate(selectedReservation.checkOutDate)}
+                </p>
+                <p>
+                  <strong>Total:</strong> {formatCurrency(selectedReservation.totalAmount)}
+                </p>
+              </div>
+            )}
+
+            {/* Cancel Reason */}
+            <div className="space-y-2">
+              <Label htmlFor="cancelReason">Motivo de cancelación *</Label>
+              <Textarea
+                id="cancelReason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Describe el motivo de la cancelación..."
+                rows={4}
+                className="bg-white"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCancelDialogOpen(false)}
+              disabled={cancelReservationMutation.isPending}
+            >
+              No, mantener reserva
+            </Button>
+            <Button
+              onClick={handleSubmitCancel}
+              disabled={cancelReservationMutation.isPending || !cancelReason.trim()}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {cancelReservationMutation.isPending ? (
+                <>
+                  <LoadingSpinner />
+                  Cancelando...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Sí, cancelar reserva
                 </>
               )}
             </Button>
