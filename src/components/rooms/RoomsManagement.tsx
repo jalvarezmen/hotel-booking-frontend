@@ -501,14 +501,35 @@ export function RoomsManagement() {
                     type="number"
                     min="1"
                     max="10"
-                    value={formData.capacity}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        capacity: parseInt(e.target.value) || 1,
-                      })
-                    }
-                    placeholder="1-10"
+                    value={formData.capacity || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Permitir campo vacío mientras el usuario escribe
+                      if (value === '') {
+                        setFormData({
+                          ...formData,
+                          capacity: 0,
+                        });
+                      } else {
+                        const numValue = parseInt(value, 10);
+                        if (!isNaN(numValue)) {
+                          setFormData({
+                            ...formData,
+                            capacity: numValue,
+                          });
+                        }
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Si está vacío al perder el foco, establecer valor por defecto
+                      if (!e.target.value || parseInt(e.target.value, 10) < 1) {
+                        setFormData({
+                          ...formData,
+                          capacity: 1,
+                        });
+                      }
+                    }}
+                    placeholder="Ingresa el número de personas (1-10)"
                     className={`h-12 rounded-xl bg-[#FEFDFB] border-[#E8DED0] text-[#3E2723] placeholder:text-[#8B7355]/50 focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/20 transition-all ${
                       errors.capacity ? 'border-red-400 ring-2 ring-red-400/20' : ''
                     }`}
@@ -525,7 +546,7 @@ export function RoomsManagement() {
               <div className="space-y-2">
                 <Label htmlFor="pricePerNight" className="text-[#3E2723] font-medium flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-[#FF6B35]" />
-                  Precio por Noche *
+                  $ Precio por Noche *
                 </Label>
                 <div className="relative">
                   <Input
@@ -533,13 +554,34 @@ export function RoomsManagement() {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={formData.pricePerNight}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pricePerNight: parseFloat(e.target.value) || 0,
-                      })
-                    }
+                    value={formData.pricePerNight || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Permitir campo vacío mientras el usuario escribe
+                      if (value === '') {
+                        setFormData({
+                          ...formData,
+                          pricePerNight: 0,
+                        });
+                      } else {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                          setFormData({
+                            ...formData,
+                            pricePerNight: numValue,
+                          });
+                        }
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Si está vacío al perder el foco, establecer valor por defecto
+                      if (!e.target.value || parseFloat(e.target.value) <= 0) {
+                        setFormData({
+                          ...formData,
+                          pricePerNight: 0,
+                        });
+                      }
+                    }}
                     placeholder="0.00"
                     className={`h-12 rounded-xl bg-[#FEFDFB] border-[#E8DED0] text-[#3E2723] placeholder:text-[#8B7355]/50 focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/20 transition-all ${
                       errors.pricePerNight ? 'border-red-400 ring-2 ring-red-400/20' : ''

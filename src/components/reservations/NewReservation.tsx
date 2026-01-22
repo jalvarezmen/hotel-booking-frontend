@@ -456,12 +456,36 @@ export function NewReservation() {
                   type="number"
                   min="1"
                   max="10"
-                  value={reservationData.numberOfGuests}
+                  value={reservationData.numberOfGuests || ''}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value) || 1;
-                    setReservationData({ ...reservationData, numberOfGuests: value });
+                    const value = e.target.value;
+                    // Permitir campo vacío mientras el usuario escribe
+                    if (value === '') {
+                      setReservationData({
+                        ...reservationData,
+                        numberOfGuests: 0,
+                      });
+                    } else {
+                      const numValue = parseInt(value, 10);
+                      if (!isNaN(numValue)) {
+                        setReservationData({
+                          ...reservationData,
+                          numberOfGuests: numValue,
+                        });
+                      }
+                    }
                     if (errors.numberOfGuests) setErrors({ ...errors, numberOfGuests: undefined });
                   }}
+                  onBlur={(e) => {
+                    // Si está vacío al perder el foco, establecer valor por defecto
+                    if (!e.target.value || parseInt(e.target.value, 10) < 1) {
+                      setReservationData({
+                        ...reservationData,
+                        numberOfGuests: 1,
+                      });
+                    }
+                  }}
+                  placeholder="Ingresa el número de huéspedes (1-10)"
                   className={`${inputBaseClass} ${errors.numberOfGuests ? 'border-red-500' : ''}`}
                 />
                 {errors.numberOfGuests && (

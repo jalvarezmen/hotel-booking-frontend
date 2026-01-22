@@ -16,10 +16,30 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [fieldErrors, setFieldErrors] = useState<{
+    username?: string;
+    password?: string;
+  }>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setFieldErrors({});
     setIsLoading(true);
+
+    // Validación básica
+    if (!username.trim()) {
+      setFieldErrors({ username: 'El usuario es obligatorio' });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!password.trim()) {
+      setFieldErrors({ password: 'La contraseña es obligatoria' });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await authApi.login({ username, password });
@@ -35,8 +55,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       onLogin(response);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
                           error.message || 
                           'Usuario o contraseña incorrectos';
+      
+      // Mostrar error general
+      setError(errorMessage);
+      
+      // Mostrar errores en campos específicos si aplica
+      if (errorMessage.toLowerCase().includes('usuario') || 
+          errorMessage.toLowerCase().includes('username')) {
+        setFieldErrors({ username: errorMessage });
+      } else if (errorMessage.toLowerCase().includes('contraseña') || 
+                 errorMessage.toLowerCase().includes('password')) {
+        setFieldErrors({ password: errorMessage });
+      } else {
+        // Error general - mostrar en ambos campos
+        setFieldErrors({
+          username: 'Credenciales incorrectas',
+          password: 'Credenciales incorrectas',
+        });
+      }
+      
       toast.error('Error de autenticación', {
         description: errorMessage,
       });
@@ -77,6 +117,23 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
             {/* Formulario */}
             <form onSubmit={handleLogin} className="space-y-6">
+              {/* Mensaje de error general */}
+              {error && (
+                <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 mt-0.5">
+                      <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-red-200 text-sm font-medium">Error de autenticación</p>
+                      <p className="text-red-300/90 text-xs mt-1">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Campo de usuario */}
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-gray-300 text-sm">
@@ -87,10 +144,29 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   type="text"
                   placeholder="Ingrese su usuario"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:border-[#FF6B35] focus:bg-white/25 transition-all duration-300 h-12 rounded-xl"
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    // Limpiar error del campo cuando el usuario empiece a escribir
+                    if (fieldErrors.username) {
+                      setFieldErrors({ ...fieldErrors, username: undefined });
+                    }
+                    if (error) {
+                      setError('');
+                    }
+                  }}
+                  className={`bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:border-[#FF6B35] focus:bg-white/25 transition-all duration-300 h-12 rounded-xl ${
+                    fieldErrors.username ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : ''
+                  }`}
                   required
                 />
+                {fieldErrors.username && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {fieldErrors.username}
+                  </p>
+                )}
               </div>
 
               {/* Campo de contraseña */}
@@ -104,8 +180,19 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Ingrese su contraseña"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:border-[#FF6B35] focus:bg-white/25 transition-all duration-300 h-12 rounded-xl pr-12"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      // Limpiar error del campo cuando el usuario empiece a escribir
+                      if (fieldErrors.password) {
+                        setFieldErrors({ ...fieldErrors, password: undefined });
+                      }
+                      if (error) {
+                        setError('');
+                      }
+                    }}
+                    className={`bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:border-[#FF6B35] focus:bg-white/25 transition-all duration-300 h-12 rounded-xl pr-12 ${
+                      fieldErrors.password ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : ''
+                    }`}
                     required
                   />
                   <button
@@ -120,6 +207,14 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     )}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {fieldErrors.password}
+                  </p>
+                )}
               </div>
 
               {/* Botón de login */}
