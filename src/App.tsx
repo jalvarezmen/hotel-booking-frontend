@@ -149,7 +149,7 @@ function MainApp() {
   }
 
   return (
-    <div className="flex h-screen bg-[#FAF8F5]">
+    <div className="flex h-screen bg-[#FAF8F5] app-container">
       {/* Sidebar */}
       <Sidebar
         currentView={currentView}
@@ -159,7 +159,7 @@ function MainApp() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto relative z-20">
         <div className="p-8">
           {currentView === 'dashboard' && (
             <>

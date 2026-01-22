@@ -39,6 +39,8 @@ const roomTypeLabels: Record<RoomType, string> = {
   [RoomType.SUITE]: 'Suite',
 };
 
+const inputBaseClass = 'border-[#D4C5B0]/50 text-[#3E2723] placeholder:text-[#8B7355] bg-white focus-visible:border-[#FF6B35] focus-visible:ring-[#FF6B35]/20';
+
 export function NewReservation() {
   const [currentStep, setCurrentStep] = useState(1);
   const [guestData, setGuestData] = useState<GuestFormData>({
@@ -295,7 +297,7 @@ export function NewReservation() {
       </div>
 
       {/* Form Content */}
-      <Card className="bg-white">
+      <Card className="bg-white border-[#D4C5B0]/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {currentStep === 1 && <User className="w-5 h-5" />}
@@ -317,7 +319,7 @@ export function NewReservation() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre *</Label>
+                  <Label htmlFor="firstName" className="text-[#3E2723]">Nombre *</Label>
                   <Input
                     id="firstName"
                     value={guestData.firstName}
@@ -326,7 +328,7 @@ export function NewReservation() {
                       if (errors.firstName) setErrors({ ...errors, firstName: undefined });
                     }}
                     placeholder="Juan"
-                    className={errors.firstName ? 'border-red-500' : ''}
+                    className={`${inputBaseClass} ${errors.firstName ? 'border-red-500' : ''}`}
                   />
                   {errors.firstName && (
                     <p className="text-sm text-red-500">{errors.firstName}</p>
@@ -334,7 +336,7 @@ export function NewReservation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido *</Label>
+                  <Label htmlFor="lastName" className="text-[#3E2723]">Apellido *</Label>
                   <Input
                     id="lastName"
                     value={guestData.lastName}
@@ -343,7 +345,7 @@ export function NewReservation() {
                       if (errors.lastName) setErrors({ ...errors, lastName: undefined });
                     }}
                     placeholder="Pérez"
-                    className={errors.lastName ? 'border-red-500' : ''}
+                    className={`${inputBaseClass} ${errors.lastName ? 'border-red-500' : ''}`}
                   />
                   {errors.lastName && (
                     <p className="text-sm text-red-500">{errors.lastName}</p>
@@ -352,7 +354,7 @@ export function NewReservation() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="documentNumber">Número de Documento *</Label>
+                <Label htmlFor="documentNumber" className="text-[#3E2723]">Número de Documento *</Label>
                 <Input
                   id="documentNumber"
                   value={guestData.documentNumber}
@@ -361,7 +363,7 @@ export function NewReservation() {
                     if (errors.documentNumber) setErrors({ ...errors, documentNumber: undefined });
                   }}
                   placeholder="12345678"
-                  className={errors.documentNumber ? 'border-red-500' : ''}
+                  className={`${inputBaseClass} ${errors.documentNumber ? 'border-red-500' : ''}`}
                 />
                 {errors.documentNumber && (
                   <p className="text-sm text-red-500">{errors.documentNumber}</p>
@@ -369,7 +371,7 @@ export function NewReservation() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Correo Electrónico *</Label>
+                <Label htmlFor="email" className="text-[#3E2723]">Correo Electrónico *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -379,7 +381,7 @@ export function NewReservation() {
                     if (errors.email) setErrors({ ...errors, email: undefined });
                   }}
                   placeholder="juan.perez@example.com"
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={`${inputBaseClass} ${errors.email ? 'border-red-500' : ''}`}
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email}</p>
@@ -387,7 +389,7 @@ export function NewReservation() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono *</Label>
+                <Label htmlFor="phone" className="text-[#3E2723]">Teléfono *</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -397,7 +399,7 @@ export function NewReservation() {
                     if (errors.phone) setErrors({ ...errors, phone: undefined });
                   }}
                   placeholder="+54 11 1234-5678"
-                  className={errors.phone ? 'border-red-500' : ''}
+                  className={`${inputBaseClass} ${errors.phone ? 'border-red-500' : ''}`}
                 />
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone}</p>
@@ -411,7 +413,7 @@ export function NewReservation() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="checkInDate">Fecha de Entrada *</Label>
+                  <Label htmlFor="checkInDate" className="text-[#3E2723]">Fecha de Entrada *</Label>
                   <Input
                     id="checkInDate"
                     type="date"
@@ -421,7 +423,7 @@ export function NewReservation() {
                       if (errors.checkInDate) setErrors({ ...errors, checkInDate: undefined });
                     }}
                     min={new Date().toISOString().split('T')[0]}
-                    className={errors.checkInDate ? 'border-red-500' : ''}
+                    className={`${inputBaseClass} ${errors.checkInDate ? 'border-red-500' : ''}`}
                   />
                   {errors.checkInDate && (
                     <p className="text-sm text-red-500">{errors.checkInDate}</p>
@@ -429,7 +431,7 @@ export function NewReservation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="checkOutDate">Fecha de Salida *</Label>
+                  <Label htmlFor="checkOutDate" className="text-[#3E2723]">Fecha de Salida *</Label>
                   <Input
                     id="checkOutDate"
                     type="date"
@@ -439,7 +441,7 @@ export function NewReservation() {
                       if (errors.checkOutDate) setErrors({ ...errors, checkOutDate: undefined });
                     }}
                     min={reservationData.checkInDate || new Date().toISOString().split('T')[0]}
-                    className={errors.checkOutDate ? 'border-red-500' : ''}
+                    className={`${inputBaseClass} ${errors.checkOutDate ? 'border-red-500' : ''}`}
                   />
                   {errors.checkOutDate && (
                     <p className="text-sm text-red-500">{errors.checkOutDate}</p>
@@ -448,7 +450,7 @@ export function NewReservation() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="numberOfGuests">Número de Huéspedes *</Label>
+                <Label htmlFor="numberOfGuests" className="text-[#3E2723]">Número de Huéspedes *</Label>
                 <Input
                   id="numberOfGuests"
                   type="number"
@@ -460,7 +462,7 @@ export function NewReservation() {
                     setReservationData({ ...reservationData, numberOfGuests: value });
                     if (errors.numberOfGuests) setErrors({ ...errors, numberOfGuests: undefined });
                   }}
-                  className={errors.numberOfGuests ? 'border-red-500' : ''}
+                  className={`${inputBaseClass} ${errors.numberOfGuests ? 'border-red-500' : ''}`}
                 />
                 {errors.numberOfGuests && (
                   <p className="text-sm text-red-500">{errors.numberOfGuests}</p>
@@ -511,7 +513,7 @@ export function NewReservation() {
                     .map((room) => (
                       <Card
                         key={room.id}
-                        className={`bg-white cursor-pointer transition-all ${
+                        className={`bg-white border-[#D4C5B0]/30 cursor-pointer transition-all ${
                           reservationData.roomId === room.id
                             ? 'ring-2 ring-[#FF6B35] border-[#FF6B35]'
                             : 'hover:border-[#FF6B35]'

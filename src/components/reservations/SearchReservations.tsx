@@ -91,7 +91,7 @@ export function SearchReservations() {
       </div>
 
       {/* Search Section */}
-      <Card className="bg-white">
+      <Card className="bg-white border-[#D4C5B0]/30">
         <CardContent className="p-6">
           <Tabs value={searchType} onValueChange={(value) => setSearchType(value as SearchType)}>
             <TabsList className="grid w-full grid-cols-2 mb-4 bg-[#FFF5F0] border border-[#FFE5D9] rounded-xl p-1">
@@ -119,7 +119,7 @@ export function SearchReservations() {
                   placeholder="Ej: RES-2026-4581DB"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-10 bg-white"
+                  className="pl-10 pr-10 bg-white border-[#D4C5B0]/50"
                 />
                 {searchQuery && (
                   <Button
@@ -145,7 +145,7 @@ export function SearchReservations() {
                   placeholder="Ej: Juan, Pérez, Juan Pérez"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-10 bg-white"
+                  className="pl-10 pr-10 bg-white border-[#D4C5B0]/50"
                 />
                 {searchQuery && (
                   <Button
@@ -174,7 +174,7 @@ export function SearchReservations() {
       )}
 
       {error && (
-        <Card className="bg-white">
+        <Card className="bg-white border-[#D4C5B0]/30">
           <CardContent className="py-12 text-center">
             <div className="text-red-500 mb-2">
               <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -188,7 +188,7 @@ export function SearchReservations() {
       )}
 
       {!isLoading && !error && hasSearched && !hasResults && (
-        <Card className="bg-white">
+        <Card className="bg-white border-[#D4C5B0]/30">
           <CardContent className="py-12 text-center">
             <Search className="w-16 h-16 text-[#D4C5B0] mx-auto mb-4" />
             <p className="text-[#8B7355] text-lg">No se encontraron reservas</p>
@@ -218,7 +218,7 @@ export function SearchReservations() {
       )}
 
       {!hasSearched && (
-        <Card className="bg-white">
+        <Card className="bg-white border-[#D4C5B0]/30">
           <CardContent className="py-12 text-center">
             <Search className="w-16 h-16 text-[#D4C5B0] mx-auto mb-4" />
             <p className="text-[#8B7355] text-lg">Comienza tu búsqueda</p>
@@ -240,7 +240,7 @@ interface ReservationCardProps {
 
 function ReservationCard({ reservation }: ReservationCardProps) {
   return (
-    <Card className="bg-white hover:shadow-lg transition-shadow duration-300">
+    <Card className="bg-white hover:shadow-lg transition-shadow duration-300 border-[#D4C5B0]/30">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
