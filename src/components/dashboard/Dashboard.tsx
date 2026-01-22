@@ -57,11 +57,12 @@ export function Dashboard({ data, selectedDate, onDateChange, onCheckIn, onCheck
         <div>
           <h1 className="text-2xl font-bold text-[#3E2723]">Dashboard</h1>
           <p className="text-[#8B7355] mt-1">
-            {isToday ? 'Resumen de actividad de hoy' : 'Resumen de actividad'} - {dateObj.toLocaleDateString('es-AR', {
+            {isToday ? 'Resumen de actividad de hoy' : 'Resumen de actividad'} - {dateObj.toLocaleDateString('es-CO', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
+              timeZone: 'America/Bogota',
             })}
           </p>
         </div>

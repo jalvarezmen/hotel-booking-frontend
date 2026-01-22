@@ -601,11 +601,13 @@ export function NewReservation() {
                   Detalles de la Reserva
                 </h3>
                 <div className="bg-[#F0EAE0] rounded-lg p-4 space-y-2">
-                  <p><strong>Fecha de entrada:</strong> {new Date(reservationData.checkInDate).toLocaleDateString('es-AR', { 
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                  <p><strong>Fecha de entrada:</strong> {new Date(reservationData.checkInDate + 'T00:00:00-05:00').toLocaleDateString('es-CO', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                    timeZone: 'America/Bogota'
                   })}</p>
-                  <p><strong>Fecha de salida:</strong> {new Date(reservationData.checkOutDate).toLocaleDateString('es-AR', { 
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                  <p><strong>Fecha de salida:</strong> {new Date(reservationData.checkOutDate + 'T00:00:00-05:00').toLocaleDateString('es-CO', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                    timeZone: 'America/Bogota'
                   })}</p>
                   <p><strong>Número de noches:</strong> {nights}</p>
                   <p><strong>Número de huéspedes:</strong> {reservationData.numberOfGuests}</p>

@@ -152,11 +152,12 @@ export function ReservationsCalendar() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white">
           <DialogHeader>
             <DialogTitle>
-              {selectedDate?.toLocaleDateString('es-AR', {
+              {selectedDate?.toLocaleDateString('es-CO', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
+                timeZone: 'America/Bogota',
               })}
             </DialogTitle>
             <DialogDescription>

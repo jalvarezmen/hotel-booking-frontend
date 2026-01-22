@@ -304,12 +304,26 @@ function ReservationCard({ reservation }: ReservationCardProps) {
         {/* Status-specific info */}
         {reservation.checkInTime && (
           <div className="text-xs text-[#8B7355]">
-            Check-in: {new Date(reservation.checkInTime).toLocaleString('es-AR')}
+            Check-in: {new Date(reservation.checkInTime).toLocaleString('es-CO', {
+              timeZone: 'America/Bogota',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
           </div>
         )}
         {reservation.checkOutTime && (
           <div className="text-xs text-[#8B7355]">
-            Check-out: {new Date(reservation.checkOutTime).toLocaleString('es-AR')}
+            Check-out: {new Date(reservation.checkOutTime).toLocaleString('es-CO', {
+              timeZone: 'America/Bogota',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
           </div>
         )}
       </CardContent>
