@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { 
   User, Calendar, Bed, CheckCircle2, ArrowLeft, ArrowRight, 
-  Mail, Phone, FileText, Users, Building2, DollarSign, Image 
+  Users, Building2, DollarSign
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
@@ -14,7 +14,7 @@ import { Badge } from '../ui/badge';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { reservationsApi } from '../../services/reservationsApi';
 import { roomsApi } from '../../services/roomsApi';
-import { CreateReservationDTO, Room, RoomType } from '../../services/types';
+import { CreateReservationDTO, RoomType } from '../../services/types';
 import { formatCurrency, translateRoomType } from '../../utils/formatters';
 
 interface GuestFormData {
@@ -102,8 +102,9 @@ export function NewReservation() {
       });
       setSelectedRoomType('ALL');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al crear la reserva');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al crear la reserva';
+      toast.error(message);
     },
   });
 

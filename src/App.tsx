@@ -96,8 +96,9 @@ function MainApp() {
         toast.success('Check-in realizado exitosamente');
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al realizar check-in');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al realizar check-in';
+      toast.error(message);
     },
   });
 
@@ -117,8 +118,9 @@ function MainApp() {
         toast.success('Check-out realizado exitosamente');
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al realizar check-out');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al realizar check-out';
+      toast.error(message);
     },
   });
 

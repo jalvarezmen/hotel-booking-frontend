@@ -21,9 +21,17 @@ module.exports = {
   rules: {
     'react-refresh/only-export-components': [
       'warn',
-      { allowConstantExport: true },
+      { allowConstantExport: true, allowExportNames: ['badgeVariants', 'buttonVariants', 'cn', 'formItemVariants', 'navigationMenuTriggerStyle', 'sidebarVariants', 'toggleVariants'] },
     ],
     'react/prop-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
+  overrides: [
+    {
+      files: ['src/components/ui/**/*.tsx'],
+      rules: {
+        'react-refresh/only-export-components': 'off',
+      },
+    },
+  ],
 }
