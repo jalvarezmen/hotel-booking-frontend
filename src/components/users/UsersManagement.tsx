@@ -185,7 +185,7 @@ export function UsersManagement() {
       {users && users.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {users.map((user) => (
-            <Card key={user.id} className="bg-white hover:shadow-lg transition-shadow">
+            <Card key={user.id} className="bg-white hover:shadow-lg transition-shadow border-[#D4C5B0]/30">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -235,7 +235,7 @@ export function UsersManagement() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenDialog(user)}
-                    className="flex-1"
+                    className="flex-1 border-[#D4C5B0] hover:bg-[#FAF8F5]"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Editar

@@ -186,7 +186,7 @@ export function PendingReservations() {
           {pendingReservations.map((reservation) => (
             <Card
               key={reservation.id}
-              className="bg-white hover:shadow-lg transition-shadow duration-300"
+              className="bg-white hover:shadow-lg transition-shadow duration-300 border-[#D4C5B0]/30"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -267,7 +267,7 @@ export function PendingReservations() {
           ))}
         </div>
       ) : (
-        <Card className="bg-white">
+        <Card className="bg-white border-[#D4C5B0]/30">
           <CardContent className="py-12 text-center">
             <Clock className="w-16 h-16 text-[#D4C5B0] mx-auto mb-4" />
             <p className="text-[#8B7355] text-lg">No hay reservas pendientes</p>
