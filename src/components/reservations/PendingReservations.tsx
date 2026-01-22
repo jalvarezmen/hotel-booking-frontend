@@ -63,7 +63,7 @@ export function PendingReservations() {
       setIsPaymentDialogOpen(false);
       setSelectedReservation(null);
       setPaymentData({
-        paymentMethod: 'CASH',
+        paymentMethod: PaymentMethod.CASH,
         amount: 0,
         reference: '',
       });
@@ -109,7 +109,7 @@ export function PendingReservations() {
   const handleConfirmPayment = (reservation: Reservation) => {
     setSelectedReservation(reservation);
     setPaymentData({
-      paymentMethod: 'CASH',
+      paymentMethod: PaymentMethod.CASH,
       amount: reservation.totalAmount,
       reference: '',
     });

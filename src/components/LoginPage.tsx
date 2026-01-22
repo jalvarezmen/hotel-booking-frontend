@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Hotel } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -105,13 +105,22 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <div className="relative bg-gray-900/30 backdrop-blur-md border border-gray-700/30 rounded-3xl shadow-2xl p-8 md:p-12">
             {/* Logo y título */}
             <div className="flex flex-col items-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-400 border border-yellow-500/50 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <Hotel className="w-8 h-8 text-white" strokeWidth={1.5} />
+              <div className="mb-4 relative">
+                {/* Efecto de brillo detrás del logo */}
+                <div className="absolute inset-0 bg-white/10 blur-xl rounded-3xl opacity-50"></div>
+                {/* Contenedor del logo con efectos */}
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-4 shadow-2xl">
+                  <img
+                    src="/logo.jpg"
+                    alt="HOTEL"
+                    className="h-16 w-auto object-contain drop-shadow-2xl brightness-110 contrast-110 filter transition-all duration-300 hover:scale-105 rounded-2xl"
+                  />
+                </div>
               </div>
-              <h1 className="text-3xl font-light text-gray-200 mb-2 tracking-wide">
+              <h1 className="text-3xl font-medium italic text-gray-200 mb-2 tracking-wide">
                 Sistema de Reservas
               </h1>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm italic font-medium">
                 Acceso exclusivo para personal
               </p>
             </div>
