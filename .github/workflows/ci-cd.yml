@@ -3,7 +3,7 @@ name: 🚀 CI/CD Pipeline
 on:
   push:
     branches:
-      - '**'  # Todas las ramas
+      - '**'
   pull_request:
     branches:
       - main
@@ -14,11 +14,6 @@ jobs:
   quality-check:
     name: 🎯 Control de Calidad
     runs-on: ubuntu-latest
-    
-    # Determinar si es PR a main/develop (validaciones bloqueantes)
-    # o push a otras ramas (validaciones informativas)
-    strategy:
-      fail-fast: false
     
     steps:
       - name: 📥 Checkout del código
@@ -38,7 +33,6 @@ jobs:
           echo "📦 Instalando dependencias..."
           echo "🔧 Verificando package-lock.json..."
           
-          # Verificar si package-lock.json existe
           if [ ! -f "package-lock.json" ]; then
             echo "⚠️ package-lock.json no encontrado, generando uno nuevo..."
             npm install
@@ -48,42 +42,39 @@ jobs:
           
           echo "✅ package-lock.json encontrado"
           
-          # Intentar npm ci primero (más rápido y determinístico)
           echo "🔄 Intentando npm ci..."
           if npm ci 2>&1; then
             echo "✅ Dependencias instaladas exitosamente con npm ci"
             exit 0
           fi
           
-          # Si npm ci falla, intentar con --legacy-peer-deps
           echo "⚠️ npm ci falló, intentando con --legacy-peer-deps..."
           if npm ci --legacy-peer-deps 2>&1; then
             echo "✅ Dependencias instaladas con npm ci --legacy-peer-deps"
             exit 0
           fi
           
-          # Si aún falla, usar npm install (regenerará el lock file)
           echo "⚠️ npm ci falló completamente, el package-lock.json está desincronizado"
           echo "🔄 Regenerando package-lock.json con npm install..."
           npm install
           echo "✅ Dependencias instaladas con npm install"
           echo "⚠️ NOTA: El package-lock.json fue regenerado. Considera hacer commit del nuevo archivo."
       
-      - name: 🔍 Paso 1: ESLint - Verificar código
+      - name: 🔍 Paso 1 - ESLint
         id: lint
         run: |
           echo "🔍 Ejecutando análisis de código con ESLint..."
           npm run lint
         continue-on-error: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
       
-      - name: 🔷 Paso 2: TypeScript - Verificar tipos
+      - name: 🔷 Paso 2 - TypeScript
         id: typescript
         run: |
           echo "🔷 Verificando tipos de TypeScript..."
           npx tsc --noEmit
         continue-on-error: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
       
-      - name: 🏗️ Paso 3: Build - Compilar proyecto
+      - name: 🏗️ Paso 3 - Build
         id: build
         run: |
           echo "🏗️ Compilando el proyecto..."
@@ -104,7 +95,6 @@ jobs:
           echo "## 📊 Resumen de Validación" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Determinar el contexto
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "### 🔍 Validación de Pull Request" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -130,7 +120,6 @@ jobs:
           echo "| Validación | Estado |" >> $GITHUB_STEP_SUMMARY
           echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
           
-          # Verificar estado de cada paso
           if [ "${{ steps.install-deps.outcome }}" == "success" ]; then
             echo "| 📦 Instalación de dependencias | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
           else
@@ -163,7 +152,6 @@ jobs:
           
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Determinar si el job pasó o falló
           if [ "${{ steps.lint.outcome }}" == "success" ] && \
              [ "${{ steps.typescript.outcome }}" == "success" ] && \
              [ "${{ steps.build.outcome }}" == "success" ] && \
@@ -198,4 +186,3 @@ jobs:
         run: |
           echo "❌ Validaciones bloqueantes fallaron para PR a ${{ github.base_ref }}"
           exit 1
-
