@@ -1,0 +1,84 @@
+name: 🛡️ Protección de Ramas
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  enforce-standards:
+    name: 🛡️ Aplicar Estándares
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Instalar dependencias
+        run: |
+          echo "📦 Instalando dependencias..."
+          npm ci
+      
+      - name: 🔍 Paso 1: Verificar Lint
+        id: lint
+        run: |
+          echo "🔍 Ejecutando análisis de código con ESLint..."
+          npm run lint
+        continue-on-error: false
+      
+      - name: 🔷 Paso 2: Verificar TypeScript
+        id: typescript
+        run: |
+          echo "🔷 Verificando tipos de TypeScript..."
+          npx tsc --noEmit
+        continue-on-error: false
+      
+      - name: 🏗️ Paso 3: Verificar Build
+        id: build
+        run: |
+          echo "🏗️ Verificando compilación del proyecto..."
+          npm run build
+        continue-on-error: false
+      
+      - name: ✅ Paso 4: Resumen Final
+        if: always()
+        run: |
+          echo "## 🛡️ Resultado de Protección de Ramas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.lint.outcome }}" == "success" ] && [ "${{ steps.typescript.outcome }}" == "success" ] && [ "${{ steps.build.outcome }}" == "success" ]; then
+            echo "### ✅ Todas las validaciones pasaron" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "El PR está listo para ser mergeado." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Validación | Estado |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔍 ESLint | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔷 TypeScript | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🏗️ Build | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Validaciones fallaron" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "El PR **NO** puede ser mergeado hasta que se corrijan los errores." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Validación | Estado |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔍 ESLint | ${{ steps.lint.outcome == 'success' && '✅ Pasó' || '❌ Falló' }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔷 TypeScript | ${{ steps.typescript.outcome == 'success' && '✅ Pasó' || '❌ Falló' }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🏗️ Build | ${{ steps.build.outcome == 'success' && '✅ Pasó' || '❌ Falló' }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+

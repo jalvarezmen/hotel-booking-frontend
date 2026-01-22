@@ -1,0 +1,77 @@
+name: 🔄 CI Pipeline Completo
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  quality-checks:
+    name: 🎯 Control de Calidad
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Instalar dependencias
+        run: |
+          echo "📦 Instalando dependencias..."
+          npm ci
+      
+      - name: 🔍 Lint - Verificar código
+        run: |
+          echo "🔍 Ejecutando ESLint..."
+          npm run lint
+      
+      - name: 🔷 TypeScript - Verificar tipos
+        run: |
+          echo "🔷 Verificando tipos de TypeScript..."
+          npx tsc --noEmit
+      
+      - name: 🏗️ Build - Compilar proyecto
+        run: |
+          echo "🏗️ Compilando el proyecto..."
+          npm run build
+      
+      - name: 📦 Artefactos de build
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: dist-build
+          path: dist/
+          retention-days: 7
+      
+      - name: 📊 Reporte de resultados
+        if: always()
+        run: |
+          echo "## 🎯 Resultados del Control de Calidad" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "### ✅ Todas las validaciones pasaron exitosamente" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Validación | Estado |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔍 ESLint | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔷 TypeScript | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🏗️ Build | ✅ Pasó |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Algunas validaciones fallaron" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Por favor, revisa los logs para más detalles." >> $GITHUB_STEP_SUMMARY
+          fi
+

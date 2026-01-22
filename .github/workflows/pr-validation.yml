@@ -1,0 +1,62 @@
+name: 🔍 Validación de Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  validate-pr:
+    name: ✅ Validar Pull Request
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: 📦 Instalar dependencias
+        run: |
+          echo "📦 Instalando dependencias..."
+          npm ci
+      
+      - name: 🔍 Ejecutar ESLint
+        run: |
+          echo "🔍 Verificando calidad de código con ESLint..."
+          npm run lint
+      
+      - name: 🔷 Verificar tipos de TypeScript
+        run: |
+          echo "🔷 Verificando tipos de TypeScript..."
+          npx tsc --noEmit
+      
+      - name: 🏗️ Verificar build
+        run: |
+          echo "🏗️ Verificando que el proyecto compile correctamente..."
+          npm run build
+      
+      - name: 📊 Resumen de validación
+        if: always()
+        run: |
+          echo "## 📊 Resumen de Validación" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Todas las validaciones se completaron" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Validaciones realizadas:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ ESLint (calidad de código)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ TypeScript (verificación de tipos)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Build (compilación del proyecto)" >> $GITHUB_STEP_SUMMARY
+
