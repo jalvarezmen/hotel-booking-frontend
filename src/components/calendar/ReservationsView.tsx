@@ -209,9 +209,10 @@ export function ReservationsView() {
                         </div>
                         <div>
                           <h4 className="font-semibold text-[#3E2723]">
-                            {date.toLocaleDateString('es-AR', {
+                            {date.toLocaleDateString('es-CO', {
                               weekday: 'long',
                               month: 'long',
+                              timeZone: 'America/Bogota',
                             })}
                           </h4>
                           <div className="flex items-center gap-4 mt-1">
@@ -266,11 +267,12 @@ export function ReservationsView() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white">
           <DialogHeader>
             <DialogTitle>
-              {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('es-AR', {
+              {selectedDate && new Date(selectedDate + 'T00:00:00-05:00').toLocaleDateString('es-CO', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
+                timeZone: 'America/Bogota',
               })}
             </DialogTitle>
             <DialogDescription>

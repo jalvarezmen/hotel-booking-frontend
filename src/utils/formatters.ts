@@ -1,6 +1,6 @@
 // Formatear moneda
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('es-US', {
+  return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'USD',
   }).format(amount);
@@ -9,28 +9,44 @@ export const formatCurrency = (amount: number): string => {
 // Formatear fecha
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('es-AR', {
+  return new Intl.DateTimeFormat('es-CO', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'America/Bogota',
   }).format(date);
 };
 
 // Formatear fecha corta
 export const formatShortDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('es-AR', {
+  return new Intl.DateTimeFormat('es-CO', {
     month: 'short',
     day: 'numeric',
+    timeZone: 'America/Bogota',
   }).format(date);
 };
 
 // Formatear hora
 export const formatTime = (dateString: string): string => {
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('es-AR', {
+  return new Intl.DateTimeFormat('es-CO', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'America/Bogota',
+  }).format(date);
+};
+
+// Formatear fecha y hora completa
+export const formatDateTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('es-CO', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Bogota',
   }).format(date);
 };
 
