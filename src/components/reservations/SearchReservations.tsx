@@ -57,9 +57,9 @@ export function SearchReservations() {
         try {
           const result = await reservationsApi.searchByNumber(debouncedQuery);
           return Array.isArray(result) ? result : [result];
-        } catch (err: any) {
+        } catch (err: unknown) {
           // Si no encuentra por número exacto, retornar array vacío
-          if (err.response?.status === 404) {
+          if ((err as { response?: { status?: number } })?.response?.status === 404) {
             return [];
           }
           throw err;

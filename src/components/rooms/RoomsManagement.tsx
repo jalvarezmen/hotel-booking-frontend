@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
 } from '../ui/card';
 import {
   DropdownMenu,
@@ -117,8 +116,8 @@ export function RoomsManagement() {
       toast.success('Habitación creada exitosamente');
       handleCloseDialog();
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al crear la habitación';
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al crear la habitación';
       toast.error(message);
     },
   });
@@ -142,8 +141,8 @@ export function RoomsManagement() {
       toast.success('Habitación actualizada exitosamente');
       handleCloseDialog();
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al actualizar la habitación';
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al actualizar la habitación';
       toast.error(message);
     },
   });
@@ -157,8 +156,8 @@ export function RoomsManagement() {
       setIsDeleteDialogOpen(false);
       setDeleteRoomId(null);
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al eliminar la habitación';
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al eliminar la habitación';
       toast.error(message);
     },
   });

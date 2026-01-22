@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { DoorOpen, DoorClosed, Users, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { reservationsApi } from '../../services/reservationsApi';
 import { Reservation } from '../../services/types';
-import { translateRoomType, formatDate } from '../../utils/formatters';
+import { translateRoomType } from '../../utils/formatters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,

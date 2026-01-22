@@ -68,8 +68,9 @@ export function PendingReservations() {
         reference: '',
       });
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al confirmar el pago');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al confirmar el pago';
+      toast.error(message);
     },
   });
 
@@ -99,8 +100,9 @@ export function PendingReservations() {
       setSelectedReservation(null);
       setCancelReason('');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al cancelar la reserva');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al cancelar la reserva';
+      toast.error(message);
     },
   });
 

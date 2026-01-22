@@ -55,8 +55,9 @@ export function UsersManagement() {
       toast.success('Usuario creado exitosamente');
       handleCloseDialog();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al crear usuario');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al crear usuario';
+      toast.error(message);
     },
   });
 
@@ -69,8 +70,9 @@ export function UsersManagement() {
       toast.success('Usuario actualizado exitosamente');
       handleCloseDialog();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al actualizar usuario');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al actualizar usuario';
+      toast.error(message);
     },
   });
 
@@ -81,8 +83,9 @@ export function UsersManagement() {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('Usuario eliminado exitosamente');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al eliminar usuario');
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al eliminar usuario';
+      toast.error(message);
     },
   });
 
