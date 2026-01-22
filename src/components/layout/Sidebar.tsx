@@ -1,5 +1,6 @@
 import { Home, Calendar, Search, DoorOpen, LogOut, Clock, Users } from 'lucide-react';
 import type { LoginResponse } from '../../services/types';
+import { HotelLogo } from '../common/HotelLogo';
 
 interface SidebarProps {
   currentView: string;
@@ -21,7 +22,7 @@ export function Sidebar({ currentView, onViewChange, user, onLogout }: SidebarPr
     <div className="h-screen w-64 bg-white border-r border-[#D4C5B0]/30 flex flex-col shadow-sm">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-[#D4C5B0]/30">
-        <h1 className="text-xl font-semibold text-[#3E2723]">Hotel Manager</h1>
+        <HotelLogo />
       </div>
 
       {/* User Info */}
