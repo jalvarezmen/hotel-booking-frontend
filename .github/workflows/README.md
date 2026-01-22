@@ -2,68 +2,43 @@
 
 Este directorio contiene los workflows de GitHub Actions para el proyecto Hotel Booking Frontend.
 
-## 📋 Workflows Disponibles
+## 🚀 Workflow Principal
 
-### 1. 🔍 `pr-validation.yml` - Validación de Pull Requests
-**Cuándo se ejecuta:** Cuando se crea o actualiza un PR hacia `main` o `develop`
+### `ci-cd.yml` - Pipeline CI/CD Único ⭐
+**Este es el workflow principal que se ejecuta automáticamente.**
 
-**Validaciones:**
-- ✅ ESLint (calidad de código)
-- ✅ TypeScript (verificación de tipos)
-- ✅ Build (compilación del proyecto)
-
-**Restricciones:** 
-- ❌ **BLOQUEANTE** - El PR no puede ser mergeado si falla alguna validación
-
----
-
-### 2. 🚀 `push-validation.yml` - Validación en Push
-**Cuándo se ejecuta:** Cuando se hace push a cualquier rama (excepto `main` y `develop`)
+**Cuándo se ejecuta:**
+- ✅ Push a cualquier rama
+- ✅ Pull Requests a `main` o `develop`
 
 **Validaciones:**
-- ⚠️ ESLint (informativo, no bloqueante)
-- ⚠️ TypeScript (informativo, no bloqueante)
-- ⚠️ Build (informativo, no bloqueante)
-
-**Restricciones:**
-- ✅ **NO BLOQUEANTE** - Permite el push aunque haya advertencias
-
----
-
-### 3. 🔄 `ci.yml` - Pipeline CI Completo
-**Cuándo se ejecuta:** 
-- Push a `main` o `develop`
-- Pull requests a `main` o `develop`
-- Manualmente (workflow_dispatch)
-
-**Validaciones:**
-- ✅ ESLint
-- ✅ TypeScript
-- ✅ Build
+- 📦 Instalación de dependencias (con manejo inteligente de package-lock.json)
+- 🔍 ESLint (calidad de código)
+- 🔷 TypeScript (verificación de tipos)
+- 🏗️ Build (compilación del proyecto)
 - 📦 Genera artefactos de build
 
----
-
-### 4. 🛡️ `branch-protection.yml` - Protección de Ramas
-**Cuándo se ejecuta:** Pull requests a `main` o `develop`
-
-**Validaciones:**
-- 🔍 ESLint (obligatorio)
-- 🔷 TypeScript (obligatorio)
-- 🏗️ Build (obligatorio)
-
 **Restricciones:**
-- ❌ **BLOQUEANTE** - El PR no puede ser mergeado si falla alguna validación
+- ❌ **BLOQUEANTE** para PRs a `main`/`develop` - Todas las validaciones deben pasar
+- ⚠️ **INFORMATIVO** para push a otras ramas - Muestra advertencias pero no bloquea
+
+**Características especiales:**
+- 🔧 Manejo inteligente de `package-lock.json` desincronizado
+- 📊 Resúmenes detallados con emojis en GitHub Actions
+- 🎯 Pasos numerados y claramente definidos
+- ✅ Estados visuales claros (✅ Pasó / ❌ Falló)
 
 ---
 
-## 🎯 Flujo de Trabajo Recomendado
+
+## 🎯 Flujo de Trabajo
 
 ### Para Pull Requests a `main` o `develop`:
 1. Crear una rama desde `develop` o `main`
 2. Hacer cambios y commits
 3. Crear Pull Request
-4. **Automáticamente se ejecutan validaciones:**
+4. **Automáticamente se ejecuta `ci-cd.yml`:**
+   - 📦 Instala dependencias (maneja package-lock.json automáticamente)
    - ✅ ESLint debe pasar
    - ✅ TypeScript debe compilar sin errores
    - ✅ Build debe ser exitoso
@@ -72,10 +47,14 @@ Este directorio contiene los workflows de GitHub Actions para el proyecto Hotel 
 
 ### Para Push a ramas de desarrollo:
 1. Hacer push a tu rama de feature
-2. **Se ejecutan validaciones informativas:**
+2. **Se ejecuta `ci-cd.yml` con validaciones informativas:**
    - ⚠️ Advertencias no bloquean el push
-   - 📊 Se muestra resumen de validaciones
+   - 📊 Se muestra resumen detallado de validaciones
 3. Puedes continuar trabajando mientras corriges advertencias
+
+### Para Push a `main` o `develop`:
+- ⚠️ **Todas las validaciones son bloqueantes**
+- El push fallará si hay errores
 
 ---
 
@@ -89,15 +68,13 @@ Este directorio contiene los workflows de GitHub Actions para el proyecto Hotel 
      - ✅ Require status checks to pass before merging
      - ✅ Require branches to be up to date before merging
      - ✅ Status checks requeridos:
-       - `validate-pr / validate-pr`
-       - `branch-protection / enforce-standards`
+       - `Control de Calidad / quality-check`
    
    - Para `develop`:
      - ✅ Require a pull request before merging
      - ✅ Require status checks to pass before merging
      - ✅ Status checks requeridos:
-       - `validate-pr / validate-pr`
-       - `branch-protection / enforce-standards`
+       - `Control de Calidad / quality-check`
 
 2. **Actions Permissions** (Settings → Actions → General):
    - ✅ Allow all actions and reusable workflows
