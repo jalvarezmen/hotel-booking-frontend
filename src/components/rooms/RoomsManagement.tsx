@@ -672,30 +672,79 @@ export function RoomsManagement() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+        <AlertDialogContent className="sm:max-w-[500px] rounded-2xl bg-white border-[#D4C5B0] shadow-2xl backdrop-blur-0 p-0 overflow-hidden">
+          {/* Header con gradiente de advertencia */}
+          <div className="bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50/50 px-6 pt-6 pb-4 border-b border-red-100/50">
+            <AlertDialogHeader className="text-left">
+              <div className="flex items-start gap-4">
+                {/* Icono de advertencia */}
+                <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20 flex-shrink-0">
+                  <Trash2 className="w-7 h-7 text-white" strokeWidth={2.5} />
+                </div>
+                <div className="flex-1 pt-1">
+                  <AlertDialogTitle className="text-2xl font-bold text-[#3E2723] mb-2">
+                    ¿Eliminar habitación?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-[#8B7355] text-base leading-relaxed">
+                    Esta acción no se puede deshacer. La habitación será eliminada permanentemente del sistema.
+                  </AlertDialogDescription>
+                </div>
               </div>
-              <div>
-                <AlertDialogTitle className="text-xl font-bold text-[#3E2723]">
-                  ¿Eliminar habitación?
-                </AlertDialogTitle>
-              </div>
+            </AlertDialogHeader>
+          </div>
+
+          {/* Información de la habitación a eliminar */}
+          {deleteRoomId && rooms && (
+            <div className="px-6 py-4 bg-[#FAF8F5]/50 border-b border-[#E8DED0]/50">
+              {(() => {
+                const roomToDelete = rooms.find(r => r.id === deleteRoomId);
+                if (roomToDelete) {
+                  return (
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#E8DED0]">
+                      {roomToDelete.imageUrl ? (
+                        <img
+                          src={roomToDelete.imageUrl}
+                          alt={roomToDelete.roomNumber}
+                          className="w-16 h-16 rounded-lg object-cover border border-[#E8DED0]"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-[#FF6B35]/10 to-[#FF8C42]/10 flex items-center justify-center border border-[#E8DED0]">
+                          <Building2 className="w-8 h-8 text-[#FF6B35]" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[#3E2723] truncate">
+                          Habitación {roomToDelete.roomNumber}
+                        </p>
+                        <p className="text-sm text-[#8B7355]">
+                          {roomTypeLabels[roomToDelete.roomType]} • {roomToDelete.capacity} personas
+                        </p>
+                      </div>
+                      <Badge 
+                        variant={roomToDelete.isAvailable ? "default" : "secondary"}
+                        className={roomToDelete.isAvailable 
+                          ? "bg-green-100 text-green-800 border-green-300" 
+                          : "bg-orange-100 text-orange-800 border-orange-300"
+                        }
+                      >
+                        {roomToDelete.isAvailable ? "Disponible" : "Ocupada"}
+                      </Badge>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
-            <AlertDialogDescription className="text-[#8B7355] mt-2">
-              Esta acción no se puede deshacer. La habitación será eliminada permanentemente
-              del sistema y no podrás recuperarla.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="pt-4 gap-3">
+          )}
+
+          {/* Footer con botones */}
+          <AlertDialogFooter className="px-6 py-4 bg-white gap-3 sm:flex-row sm:justify-end">
             <AlertDialogCancel
               onClick={() => {
                 setIsDeleteDialogOpen(false);
                 setDeleteRoomId(null);
               }}
-              className="h-11 rounded-xl border-[#E8DED0] text-[#3E2723] hover:bg-[#FAF8F5] hover:border-[#D4C5B0] transition-all"
+              className="h-11 px-6 rounded-xl border-[#E8DED0] text-[#3E2723] bg-white hover:bg-[#FAF8F5] hover:border-[#D4C5B0] transition-all duration-200 font-medium shadow-sm"
             >
               Cancelar
             </AlertDialogCancel>
@@ -705,18 +754,18 @@ export function RoomsManagement() {
                   deleteMutation.mutate(deleteRoomId);
                 }
               }}
-              className="h-11 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-none shadow-lg hover:shadow-red-600/40 transition-all duration-300 rounded-xl font-medium"
+              className="h-11 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-none shadow-lg hover:shadow-xl hover:shadow-red-600/30 transition-all duration-300 rounded-xl font-medium flex items-center gap-2"
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? (
-                <span className="flex items-center gap-2">
+                <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Eliminando...
-                </span>
+                </>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Eliminar
+                  <Trash2 className="w-4 h-4" />
+                  Eliminar permanentemente
                 </>
               )}
             </AlertDialogAction>
