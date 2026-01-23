@@ -671,3 +671,4 @@ src/
 **Última actualización**: Diciembre 2024  
 **Versión del documento**: 1.0
 
+

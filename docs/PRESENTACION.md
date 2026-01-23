@@ -16,7 +16,7 @@
 - Deben manejar múltiples roles de usuario (Administradores y Recepcionistas)
 - Requieren un sistema que sea intuitivo, rápido y confiable
 
-### [0:30 - 1:00] Problema a Resolver
+###  Problema a Resolver
 
 **El problema principal era:**
 - Sistemas legacy que no se adaptan a las necesidades actuales
@@ -25,7 +25,7 @@
 - Dificultad para gestionar múltiples usuarios con diferentes permisos
 - Necesidad de un sistema escalable y mantenible
 
-### [1:00 - 2:00] Solución Propuesta
+### Solución Propuesta
 
 **Nuestra solución es un sistema full-stack que incluye:**
 
@@ -160,7 +160,7 @@ Confirmar Pago → Actualizar Estado → Notificar
 
 ## CULTURA DEVOPS Y CALIDAD
 
-### [10:00 - 11:00] Testing y Cobertura
+### Testing y Cobertura
 
 **Backend - Testing:**
 - **Cobertura: 85%** (objetivo: 70%, superado)
